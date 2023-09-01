@@ -26,3 +26,34 @@ class BayesNet:
     """
     def __init__(self, allNodes):
         self.allNodes = allNodes
+    
+    def getTopologicalOrder(self):
+        sortedNodes = []
+        inDegrees = {}
+
+        for nodeId in list(self.allNodes.keys()):
+            inDegrees[nodeId] = 0
+
+        # Initialize the edges to the parents
+        for nodeId in list(self.allNodes.keys()):
+            for parentId in self.allNodes[nodeId].parents:
+                inDegrees[parentId] += 1
+        
+        #Finding the nodes that don't have parents
+        queue = []
+        for nodeId in list(self.allNodes.keys()):
+            if inDegrees[nodeId] == 0:
+                queue.append(nodeId)
+        
+        while (len(queue) > 0):
+            currNodeId = queue.pop(0)
+
+            sortedNodes.append(currNodeId)
+            for parentId in self.allNodes[currNodeId].parents:
+                inDegrees[parentId] -= 1
+
+                if (inDegrees[parentId] == 0):
+                    queue.append(parentId)
+        
+        # The topological algorithm was performed backwards, so a reversal is required.
+        return list(reversed(sortedNodes))
