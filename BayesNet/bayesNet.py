@@ -21,8 +21,8 @@ class BayesNode:
 
 class BayesNet:
     """
-        @param allNodes: List(BayesNode)
-            Simply a list of 'BayesNode' that represent all of the nodes in the bayesian network.
+        @param allNodes: {integer: BayesNode}
+            Dictionary of BayesNodes where the key is the node id
     """
     def __init__(self, allNodes):
         self.allNodes = allNodes
