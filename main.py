@@ -2,7 +2,8 @@ from BayesNet.loadBayesNet import loadInBayesNet
 
 def main():
     
-    test = loadInBayesNet('./bn.json')
+    test = loadInBayesNet('./Reference/polytree50.json')
+    order = test.getTopologicalOrder()
     print()
 
 if __name__ == "__main__":
