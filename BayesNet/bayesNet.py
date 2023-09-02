@@ -1,3 +1,5 @@
+import random
+
 class BayesNode:
     """
         @param nodeId: Integer
@@ -20,7 +22,7 @@ class BayesNode:
         self.cpt = cpt
         self.children = []
     
-    def lookUpProbability(self, nodeValue, parentValues):
+    def lookUpProb_givenNodeAndParentValues(self, nodeValue, parentValues):
         if isinstance(parentValues, list):
             prob = self.cpt[tuple(parentValues)]
 
@@ -87,8 +89,14 @@ class BayesNet:
         
         return order
 
-    def sampleValueFromNetwork(self, queryId, evidence):
-        pass
+    def __sampleValueFromNetwork(self, queryId, evidence):
+        prob = self.allNodes[queryId].cpt[evidence]
+        chance = random.uniform(0, 1)
+
+        if (chance < prob):
+            return 1
+        else:
+            return 0
     
     def __getWeightedSample(self, evidence):
         weight = 1
@@ -107,17 +115,23 @@ class BayesNet:
             if nodeId in list(evidence.keys()):
                 nodeValue = event[nodeId]
                 parentValues = [event[parentId] for parentId in parentIds]
-
-                prob = self.allNodes[nodeId].lookUpProbability(nodeValue, parentValues)
+                prob = self.allNodes[nodeId].lookUpProb_givenNodeAndParentValues(nodeValue, parentValues)
                 
                 weight *= prob
             else:
-                pass
+                localEvidence = [event[parentId] for parentId in parentIds]
+                sampledValue = self.__sampleValueFromNetwork(nodeId, tuple(localEvidence))
+
+                event[nodeId] = sampledValue
+        
+        return (event, weight)
 
     """
         @param query: Integer
+            The node id to be queried from the network
 
         @param evidence: {Integer: Integer} (NodeID: NodeValue)
+            This dictionary will map the evidence node is to its given node value
 
         @param N: Integer
             The number of samples to calculate
