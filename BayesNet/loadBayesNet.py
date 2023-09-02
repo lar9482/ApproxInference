@@ -1,4 +1,5 @@
 from BayesNet.bayesNet import BayesNet, BayesNode
+
 import json
 """
     @param filename: string
