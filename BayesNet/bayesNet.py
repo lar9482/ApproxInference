@@ -126,6 +126,13 @@ class BayesNet:
         
         return (event, weight)
 
+    def __normalizeVector(self, vector):
+        sumOfWeightedCounts = sum(list(vector.values()))
+
+        for value in list(vector.keys()):
+            vector[value] /= sumOfWeightedCounts
+        
+        return vector
     """
         @param query: Integer
             The node id to be queried from the network
@@ -140,4 +147,8 @@ class BayesNet:
         W = {0: 0, 1: 0}
 
         for _ in range(0, N):
-            self.__getWeightedSample(evidence)
+            (event, weight) = self.__getWeightedSample(evidence)
+            queryValue = event[query]
+            W[queryValue] += weight
+        
+        return self.__normalizeVector(W)

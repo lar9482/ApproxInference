@@ -12,9 +12,9 @@ def main():
         25: 0,
         45: 1
     }
-    numSamples = 100
+    numSamples = 500
 
-    BN.likelihoodWeighting_Query(query, evidence, numSamples)
+    W = BN.likelihoodWeighting_Query(query, evidence, numSamples)
     
 if __name__ == "__main__":
     main()
