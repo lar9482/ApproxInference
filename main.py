@@ -2,9 +2,19 @@ from BayesNet.loadBayesNet import loadInBayesNet
 
 def main():
     
-    test = loadInBayesNet('./Reference/polytree50.json')
-    test.getTopologicalOrder()
-    print()
+    BN = loadInBayesNet('./Reference/polytree50.json')
 
+    query = 5
+    evidence = {
+        0: 0,
+        4: 1,
+        10: 1,
+        25: 0,
+        45: 1
+    }
+    numSamples = 100
+
+    BN.likelihoodWeighting_Query(query, evidence, numSamples)
+    
 if __name__ == "__main__":
     main()
