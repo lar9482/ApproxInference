@@ -19,6 +19,28 @@ class BayesNode:
         self.parents = parentIds
         self.cpt = cpt
         self.children = []
+    
+    def lookUpProbability(self, nodeValue, parentValues):
+        if isinstance(parentValues, list):
+            prob = self.cpt[tuple(parentValues)]
+
+            if (nodeValue == 0):
+                return (1 - prob)
+            elif (nodeValue == 1):
+                return prob      
+            else:
+                raise ValueError('nodeValue is not a bernoulli variable')
+        elif isinstance(parentValues, tuple):
+            prob = self.cpt[parentValues]
+
+            if (nodeValue == 0):
+                return (1 - prob)
+            elif (nodeValue == 1):
+                return prob
+            else:
+                raise ValueError('nodeValue is not a bernoulli variable')
+        else:
+            raise ValueError('parentValues is neither a list nor tuple')
 
 class BayesNet:
     """
@@ -38,6 +60,7 @@ class BayesNet:
                     self.allNodes[nodeId].children.append(otherNodeId)
     
     def __getTopologicalOrder(self):
+
         # Initialize dict that keeps track of incoming edges.
         inDegree = {}
         for nodeId in list(self.allNodes.keys()):
@@ -64,10 +87,14 @@ class BayesNet:
         
         return order
 
+    def sampleValueFromNetwork(self, queryId, evidence):
+        pass
+    
     def __getWeightedSample(self, evidence):
         weight = 1
         event = {}
-    
+
+        # Initializing the vector with evidences that are fixed by the evidence. 
         for nodeId in list(self.allNodes.keys()):
             if (evidence.get(nodeId) != None):
                 event[nodeId] = evidence[nodeId]
@@ -75,7 +102,17 @@ class BayesNet:
                 event[nodeId] = 0
 
         for nodeId in self.__getTopologicalOrder():
-            pass
+            parentIds = self.allNodes[nodeId].parents
+
+            if nodeId in list(evidence.keys()):
+                nodeValue = event[nodeId]
+                parentValues = [event[parentId] for parentId in parentIds]
+
+                prob = self.allNodes[nodeId].lookUpProbability(nodeValue, parentValues)
+                
+                weight *= prob
+            else:
+                pass
 
     """
         @param query: Integer
