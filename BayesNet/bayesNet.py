@@ -18,6 +18,7 @@ class BayesNode:
         self.nodeId = nodeId
         self.parents = parentIds
         self.cpt = cpt
+        self.children = []
 
 class BayesNet:
     """
@@ -26,34 +27,66 @@ class BayesNet:
     """
     def __init__(self, allNodes):
         self.allNodes = allNodes
+        self.__determineChildren()
+        
+    def __determineChildren(self):
+        for nodeId in list(self.allNodes.keys()):
+            for otherNodeId in list(self.allNodes.keys()):
+                if (otherNodeId == nodeId):
+                    continue
+                elif (nodeId in self.allNodes[otherNodeId].parents):
+                    self.allNodes[nodeId].children.append(otherNodeId)
     
-    def getTopologicalOrder(self):
-        sortedNodes = []
-        inDegrees = {}
+    def __getTopologicalOrder(self):
+        # Initialize dict that keeps track of incoming edges.
+        inDegree = {}
+        for nodeId in list(self.allNodes.keys()):
+            inDegree[nodeId] = 0
 
+        # Counting the number of incoming edges for the child nodes
         for nodeId in list(self.allNodes.keys()):
-            inDegrees[nodeId] = 0
+            for childNodeId in self.allNodes[nodeId].children:
+                inDegree[childNodeId] += 1
 
-        # Initialize the edges to the parents
-        for nodeId in list(self.allNodes.keys()):
-            for parentId in self.allNodes[nodeId].parents:
-                inDegrees[parentId] += 1
-        
-        #Finding the nodes that don't have parents
-        queue = []
-        for nodeId in list(self.allNodes.keys()):
-            if inDegrees[nodeId] == 0:
-                queue.append(nodeId)
-        
+        queue = list(nodeId for nodeId in list(self.allNodes.keys()) if inDegree[nodeId] == 0)
+        order = []
+
         while (len(queue) > 0):
-            currNodeId = queue.pop(0)
+            nodeId = queue.pop(0)
+            order.append(nodeId)
 
-            sortedNodes.append(currNodeId)
-            for parentId in self.allNodes[currNodeId].parents:
-                inDegrees[parentId] -= 1
+            # Reduce the number of tracked edge counts
+            for childId in self.allNodes[nodeId].children:
+                inDegree[childId] -= 1
 
-                if (inDegrees[parentId] == 0):
-                    queue.append(parentId)
+                if inDegree[childId] == 0:
+                    queue.append(childId)
         
-        # The topological algorithm was performed backwards, so a reversal is required.
-        return list(reversed(sortedNodes))
+        return order
+
+    def __getWeightedSample(self, evidence):
+        weight = 1
+        event = {}
+    
+        for nodeId in list(self.allNodes.keys()):
+            if (evidence.get(nodeId) != None):
+                event[nodeId] = evidence[nodeId]
+            else:
+                event[nodeId] = 0
+
+        for nodeId in self.__getTopologicalOrder():
+            pass
+
+    """
+        @param query: Integer
+
+        @param evidence: {Integer: Integer} (NodeID: NodeValue)
+
+        @param N: Integer
+            The number of samples to calculate
+    """
+    def likelihoodWeighting_Query(self, query, evidence, N):
+        W = {0: 0, 1: 0}
+
+        for _ in range(0, N):
+            self.__getWeightedSample(evidence)
