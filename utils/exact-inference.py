@@ -153,13 +153,19 @@ def runner():
     bn = Bayes_Net()
     bn.create_from_json(jsonfileloc)
     # bn.draw()
-
+    evidence = {
+        1: 1,
+        2: 1,
+        3: 0,
+        4: 0
+    }
+    print(evidence)
     starttime = time.time()
     if multi:
         print("Running multiprocessed exact inference on query variable", args.query[0])
     else:
         print("Running exact inference on query variable", args.query[0])
-    exact_enum = bn.enumeration_ask(args.query[0])
+    exact_enum = bn.enumeration_ask(args.query[0], evidence)
     # print(exact_enum)
     endtime = time.time()
     exact_time = (endtime-starttime)
