@@ -4,20 +4,19 @@ def main():
     
     BN = loadInBayesNet('./Reference/polytree10.json')
 
-    query = 5
-    evidence = {
-        0: 0,
-        1: 0,
-        4: 1,
-        9: 0
-    }
-    numSamples = 2500
+    query = 3
+    evidence = {}
+    # evidence = {}
+    numSamples = 1000
 
     W = BN.likelihoodWeighting_Query(query, evidence, numSamples)
     print(W)
 
-    G = BN.gibbsAsk_Query(query, evidence, numSamples)
+    (G, sampleG) = BN.gibbsAsk_Query(query, evidence, numSamples)
     print(G)
+
+    MH = BN.metropolisHasting_Query(query, evidence, numSamples, 0.90)
+    print(MH)
     
 if __name__ == "__main__":
     main()

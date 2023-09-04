@@ -61,7 +61,8 @@ class BayesNet:
         sumOfWeightedCounts = sum(list(vector.values()))
 
         for value in list(vector.keys()):
-            vector[value] /= sumOfWeightedCounts
+            if (sumOfWeightedCounts > 0):
+                vector[value] /= sumOfWeightedCounts
         
         return vector
     
@@ -144,6 +145,22 @@ class BayesNet:
         
         return prob
     
+    def __calcSampleWeight_BasedOnEvidence(self, sample, evidence):
+        weight = 1
+
+        for nodeId in self.__getTopologicalOrder():
+            nodeVariable = self.allNodes[nodeId]
+            parentIds = nodeVariable.parents
+
+            #Update the weight using parentValues from event if 'nodeId' is an evidence variable
+            if nodeId in list(evidence.keys()):
+                nodeValueFromSample = sample[nodeId]
+                parentValuesFromSample = [sample[parentId] for parentId in parentIds]
+                prob = nodeVariable.lookUpProb_givenNodeAndParentValues(nodeValueFromSample, parentValuesFromSample)
+                
+                weight *= prob
+        
+        return weight
     """
         @param query: Integer
             The node id to be queried from the network
@@ -190,4 +207,23 @@ class BayesNet:
 
             C[currNetworkState[query]] += 1
         
-        return self.__normalizeVector(C)
+        return (self.__normalizeVector(C), currNetworkState)
+    
+    def metropolisHasting_Query(self, query, evidence, N, P):
+        distribution = {0: 0, 1: 0}
+        sample = self.__getInitialSample_FixedByEvidence(evidence)
+
+        while (N >= 0):
+            chance = random.uniform(0, 1)
+
+            if (chance < P):
+                (gibbsProbDis, gibbsSample) = self.gibbsAsk_Query(query, evidence, 50)
+                sample = gibbsSample
+            else:
+                (newSample, weight) = self.__getWeightedSample(sample)
+                sample = newSample
+
+            distribution[sample[query]] += 1
+            N -= 1
+        
+        return self.__normalizeVector(distribution)
