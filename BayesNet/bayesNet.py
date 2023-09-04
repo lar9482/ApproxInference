@@ -217,11 +217,13 @@ class BayesNet:
             chance = random.uniform(0, 1)
 
             if (chance < P):
-                (gibbsProbDis, gibbsSample) = self.gibbsAsk_Query(query, evidence, 50)
+                (gibbsProbDis, gibbsSample) = self.gibbsAsk_Query(query, evidence, N)
                 sample = gibbsSample
             else:
-                (newSample, weight) = self.__getWeightedSample(sample)
-                sample = newSample
+                (newSample, newWeight) = self.__getWeightedSample(evidence)
+                oldWeight = self.__calcSampleWeight_BasedOnEvidence(sample, evidence)
+                if (newWeight > oldWeight):
+                    sample = newSample
 
             distribution[sample[query]] += 1
             N -= 1
