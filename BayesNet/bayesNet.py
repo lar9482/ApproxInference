@@ -1,50 +1,6 @@
 import random
 import copy
 
-class BayesNode:
-    """
-        @param nodeId: Integer
-            The id(name) for this particular node
-
-        @param parentIds: List(Integer)
-            Just a list of integers that point to the parent node ids
-        
-        @param cpt: {(v1, v2,...,vn): float}
-            A dictionary to represent the conditional probability table in this node.
-
-            - The key represents a tuple of values sampled from all of the parent nodes.
-
-            - The value represents the probability of the node's value being 1 based on the values of the parents.
-              P(<node_id>=1|<parents>=<assignment>)=<probability>
-    """
-    def __init__(self, nodeId, parentIds, cpt):
-        self.nodeId = nodeId
-        self.parents = parentIds
-        self.cpt = cpt
-        self.children = [] # Children will be determined, once all of the nodes are loaded into the bayes net
-    
-    def lookUpProb_givenNodeAndParentValues(self, nodeValue, parentValues):
-        if isinstance(parentValues, list):
-            prob = self.cpt[tuple(parentValues)]
-
-            if (nodeValue == 0):
-                return (1 - prob)
-            elif (nodeValue == 1):
-                return prob      
-            else:
-                raise ValueError('nodeValue is not a bernoulli variable')
-        elif isinstance(parentValues, tuple):
-            prob = self.cpt[parentValues]
-
-            if (nodeValue == 0):
-                return (1 - prob)
-            elif (nodeValue == 1):
-                return prob
-            else:
-                raise ValueError('nodeValue is not a bernoulli variable')
-        else:
-            raise ValueError('parentValues is neither a list nor tuple')
-
 class BayesNet:
     """
         @param allNodes: {integer: BayesNode}
@@ -90,6 +46,28 @@ class BayesNet:
         
         return order
 
+    # Initializing the sample with values that are fixed by the evidence. 
+    def __getInitialSample_FixedByEvidence(self, evidence):
+        sample = {}
+        for nodeId in list(self.allNodes.keys()):
+            if (evidence.get(nodeId) != None):
+                sample[nodeId] = evidence[nodeId]
+            else:
+                sample[nodeId] = 0
+        
+        return sample
+    
+    def __normalizeVector(self, vector):
+        sumOfWeightedCounts = sum(list(vector.values()))
+
+        for value in list(vector.keys()):
+            vector[value] /= sumOfWeightedCounts
+        
+        return vector
+    
+    ####################################################################################################
+    # Likelihood weighting specific methods. It basically implements weighted sampling in the network. #
+    ####################################################################################################
     def __sampleValueFromNetwork(self, queryId, evidence):
         prob = self.allNodes[queryId].cpt[evidence]
         chance = random.uniform(0, 1)
@@ -98,17 +76,10 @@ class BayesNet:
             return 1
         else:
             return 0
-        
+    
     def __getWeightedSample(self, evidence):
         weight = 1
-        event = {}
-
-        # Initializing the vector with evidences that are fixed by the evidence. 
-        for nodeId in list(self.allNodes.keys()):
-            if (evidence.get(nodeId) != None):
-                event[nodeId] = evidence[nodeId]
-            else:
-                event[nodeId] = 0
+        event = self.__getInitialSample_FixedByEvidence(evidence)
 
         for nodeId in self.__getTopologicalOrder():
             nodeVariable = self.allNodes[nodeId]
@@ -130,14 +101,49 @@ class BayesNet:
                 event[nodeId] = sampledValue
         
         return (event, weight)
+    
+    ##########################################################################################################
+    # Gibbs specific methods. Basically, they deal with sampling and prob. distribution on a markov blanket. #
+    ##########################################################################################################
+    def __sampleFromMarkovBlanket(self, query, currNetworkState):
+        probDistribution = {0: 0, 1: 0}
 
-    def __normalizeVector(self, vector):
-        sumOfWeightedCounts = sum(list(vector.values()))
+        positiveNetworkState = copy.deepcopy(currNetworkState)
+        negativeNetworkState = copy.deepcopy(currNetworkState)
+        positiveNetworkState[query] = 1
+        negativeNetworkState[query] = 0
 
-        for value in list(vector.keys()):
-            vector[value] /= sumOfWeightedCounts
+        probDistribution[0] = self.__calcMarkovBlanketProb_givenQueryAndSample(query, negativeNetworkState)
+        probDistribution[1] = self.__calcMarkovBlanketProb_givenQueryAndSample(query, positiveNetworkState)
+
+        probDistribution = self.__normalizeVector(probDistribution)
+
+        chance = random.uniform(0, 1)
+        if (chance < probDistribution[1]):
+            return 1
+        else:
+            return 0
         
-        return vector
+    def __calcMarkovBlanketProb_givenQueryAndSample(self, query, networkStateSample):
+        prob = 1
+
+        parentValues = [networkStateSample[parentId] for parentId in self.allNodes[query].parents]
+        queryValue = networkStateSample[query]
+        prob *= self.allNodes[query].lookUpProb_givenNodeAndParentValues(
+            queryValue, 
+            tuple(parentValues)
+        )
+
+        for childId in self.allNodes[query].children:
+            parentOfChildValues = [networkStateSample[parentId] for parentId in self.allNodes[childId].parents]
+            childValue = networkStateSample[childId]
+            prob *= self.allNodes[childId].lookUpProb_givenNodeAndParentValues(
+                childValue, 
+                tuple(parentOfChildValues)
+            )
+        
+        return prob
+    
     """
         @param query: Integer
             The node id to be queried from the network
@@ -157,7 +163,17 @@ class BayesNet:
             W[queryValue] += weight
         
         return self.__normalizeVector(W)
-    
+
+    """
+        @param query: Integer
+            The node id to be queried from the network
+
+        @param evidence: {Integer: Integer} (NodeID: NodeValue)
+            This dictionary will map the evidence node is to its given node value
+
+        @param N: Integer
+            The number of samples to calculate
+    """
     def gibbsAsk_Query(self, query, evidence, N):
 
         C = {0: 0, 1: 0}
@@ -165,12 +181,7 @@ class BayesNet:
              for nonEvidenceId in list(self.allNodes.keys()) 
              if not (nonEvidenceId in list(evidence.keys()))]
         
-        currNetworkState = {}
-        for nodeId in list(self.allNodes.keys()):
-            if (evidence.get(nodeId) != None):
-                currNetworkState[nodeId] = evidence[nodeId]
-            else:
-                currNetworkState[nodeId] = 0
+        currNetworkState = self.__getInitialSample_FixedByEvidence(evidence)
         
         for _ in range(0, N):
             nonEvidenceId = random.choice(nonEvidenceNodeIds)
@@ -180,44 +191,3 @@ class BayesNet:
             C[currNetworkState[query]] += 1
         
         return self.__normalizeVector(C)
-
-    def __sampleFromMarkovBlanket(self, query, currNetworkState):
-        probDistribution = {0: 0, 1: 0}
-
-        positiveNetworkState = copy.deepcopy(currNetworkState)
-        negativeNetworkState = copy.deepcopy(currNetworkState)
-        positiveNetworkState[query] = 1
-        negativeNetworkState[query] = 0
-
-        probDistribution[0] = self.__calculateProb_givenQueryAndNetworkState(query, negativeNetworkState)
-        probDistribution[1] = self.__calculateProb_givenQueryAndNetworkState(query, positiveNetworkState)
-
-        probDistribution = self.__normalizeVector(probDistribution)
-
-        chance = random.uniform(0, 1)
-
-        if (chance < probDistribution[1]):
-            return 1
-        else:
-            return 0
-        
-        
-    def __calculateProb_givenQueryAndNetworkState(self, query, networkState):
-        prob = 1
-
-        parentValues = [networkState[parentId] for parentId in self.allNodes[query].parents]
-        queryValue = networkState[query]
-        prob *= self.allNodes[query].lookUpProb_givenNodeAndParentValues(
-            queryValue, 
-            tuple(parentValues)
-        )
-
-        for childId in self.allNodes[query].children:
-            parentOfChildValues = [networkState[parentId] for parentId in self.allNodes[childId].parents]
-            childValue = networkState[childId]
-            prob *= self.allNodes[childId].lookUpProb_givenNodeAndParentValues(
-                childValue, 
-                tuple(parentOfChildValues)
-            )
-        
-        return prob
