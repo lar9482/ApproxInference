@@ -1,4 +1,5 @@
-from BayesNet.bayesNet import BayesNet, BayesNode
+from BayesNet.bayesNet import BayesNet
+from BayesNet.bayesNode import BayesNode
 
 import json
 """

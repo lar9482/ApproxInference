@@ -11,11 +11,11 @@ def main():
         4: 1,
         9: 0
     }
-    numSamples = 500
+    numSamples = 2500
 
     W = BN.likelihoodWeighting_Query(query, evidence, numSamples)
     print(W)
-    
+
     G = BN.gibbsAsk_Query(query, evidence, numSamples)
     print(G)
     
