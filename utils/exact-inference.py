@@ -157,7 +157,11 @@ def runner():
         1: 1,
         2: 1,
         3: 0,
-        4: 0
+        4: 0,
+        6: 1,
+        7: 1,
+        8: 0,
+        9: 0
     }
     print(evidence)
     starttime = time.time()
