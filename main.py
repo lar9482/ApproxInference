@@ -2,7 +2,7 @@ from BayesNet.loadBayesNet import loadInBayesNet
 
 def main():
     
-    BN = loadInBayesNet('./Reference/polytree20.json')
+    BN = loadInBayesNet('./datasetUniform/dag25.json')
 
     query = 10
     evidence = {
@@ -16,7 +16,7 @@ def main():
         9: 0
     }
     # evidence = {}
-    numSamples = 500
+    numSamples = 1000
 
     W = BN.likelihoodWeighting_Query(query, evidence, numSamples)
     print(W)
