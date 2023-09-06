@@ -227,5 +227,5 @@ class BayesNet:
 
             distribution[sample[query]] += 1
             N -= 1
-        
+
         return self.__normalizeVector(distribution)
