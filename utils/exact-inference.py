@@ -153,16 +153,7 @@ def runner():
     bn = Bayes_Net()
     bn.create_from_json(jsonfileloc)
     # bn.draw()
-    evidence = {
-        1: 1,
-        2: 1,
-        3: 0,
-        4: 0,
-        6: 1,
-        7: 1,
-        8: 0,
-        9: 0
-    }
+    evidence = { 2: 0, 4: 0 }
     print(evidence)
     starttime = time.time()
     if multi:
