@@ -3,6 +3,7 @@ from dataset.datasetParams import getUniformParams
 from results.result import testResult
 
 from openpyxl import Workbook
+from multiprocessing import Manager, Lock, Process
 
 import time
 
@@ -34,12 +35,22 @@ def runGibbsAsk_Test(name, BN, query, evidence, numSamples, numTrials):
         endTime - startTime
     )
 
-def runMetropolisHasting_Test(name, BN, query, evidence, P, numSamples, numTrials):
-    startTime = time.time()
+def runMetropolisHasting_Test(
+        name, 
+        BN, 
+        query, 
+        evidence, 
+        P, 
+        numSamples, 
+        numTrials,
+        sharedTestResults,
+        lock
+):
+    startTime = time.process_time()
     MH = BN.metropolisHasting_Query(query, evidence, numSamples, P)
-    endTime = time.time()
+    endTime = time.process_time()
 
-    return testResult(
+    newTestResult = testResult(
         name,
         numSamples,
         numTrials,
@@ -47,6 +58,39 @@ def runMetropolisHasting_Test(name, BN, query, evidence, P, numSamples, numTrial
         MH[1],
         endTime - startTime
     )
+
+    lock.acquire()
+    sharedTestResults.append(newTestResult)
+    lock.release()
+
+def runParallelMetropolisHasting_Tests(name, BN, query, evidence, P, numSamples, numTrials):
+    mhResults = []
+
+    with Manager() as manager:
+        allProcesses = []
+        lock = manager.Lock()
+        sharedTestResults = manager.list()
+
+        for _ in range(0, numTrials):
+            metroHastProcess = Process(
+                target=runMetropolisHasting_Test,
+                args=(
+                    name, BN, query, evidence, P, numSamples, numTrials,
+                    sharedTestResults,
+                    lock
+                )
+            )
+            allProcesses.append(metroHastProcess)
+        
+        for process in allProcesses:
+            process.start()
+        
+        for process in allProcesses:
+            process.join()
+        
+        mhResults = list(sharedTestResults)
+    
+    return mhResults
 
 def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10):
     for param in datasetParams:
@@ -102,81 +146,83 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
 
         print('Finished gibbs ask suite')
         ######################################################################################
-        for _ in range(0, numTrials):
-            testMHBegin_Result = runMetropolisHasting_Test(
-                'MetroHast_BeginOrder0.75',
-                BN, 
-                param.query, 
-                param.evidenceBegin, 
-                0.75,
-                numSamples, 
-                numTrials
-            )
-            testResults.append(testMHBegin_Result)
+        
+        testMHBegin_Result = runParallelMetropolisHasting_Tests(
+            'MetroHast_BeginOrder0.75',
+            BN, 
+            param.query, 
+            param.evidenceBegin, 
+            0.75,
+            numSamples, 
+            numTrials
+        )
+        testResults.extend(testMHBegin_Result)
+
         print('Finished metropolis 0.75 begin suite')
-        for _ in range(0, numTrials):
-            testMHEnd_Result = runMetropolisHasting_Test(
-                'MetroHast_EndOrder0.75',
-                BN, 
-                param.query, 
-                param.evidenceEnd, 
-                0.75,
-                numSamples, 
-                numTrials
-            )
-            testResults.append(testMHEnd_Result)
+        
+        testMHEnd_Result = runParallelMetropolisHasting_Tests(
+            'MetroHast_EndOrder0.75',
+            BN, 
+            param.query, 
+            param.evidenceEnd, 
+            0.75,
+            numSamples, 
+            numTrials
+        )
+        testResults.extend(testMHEnd_Result)
         print('Finished metropolis 0.75 end suite')
         print('Finished metropolis 0.75 suite')
         ######################################################################################
-        for _ in range(0, numTrials):
-            testMHBegin_Result = runMetropolisHasting_Test(
-                'MetroHast_BeginOrder0.85',
-                BN, 
-                param.query, 
-                param.evidenceBegin, 
-                0.85,
-                numSamples, 
-                numTrials
-            )
-            testResults.append(testMHBegin_Result)
+        
+        testMHBegin_Result = runParallelMetropolisHasting_Tests(
+            'MetroHast_BeginOrder0.85',
+            BN, 
+            param.query, 
+            param.evidenceBegin, 
+            0.85,
+            numSamples, 
+            numTrials
+        )
+        testResults.extend(testMHBegin_Result)
         print('Finished metropolis begin 0.85')
-        for _ in range(0, numTrials):
-            testMHEnd_Result = runMetropolisHasting_Test(
-                'MetroHast_EndOrder0.85',
-                BN, 
-                param.query, 
-                param.evidenceEnd, 
-                0.85,
-                numSamples, 
-                numTrials
-            )
-            testResults.append(testMHEnd_Result)
+        
+        testMHEnd_Result = runParallelMetropolisHasting_Tests(
+            'MetroHast_EndOrder0.85',
+            BN, 
+            param.query, 
+            param.evidenceEnd, 
+            0.85,
+            numSamples, 
+            numTrials
+        )
+        testResults.extend(testMHEnd_Result)
 
         print('Finished metropolis 0.85 suite')
         ######################################################################################
-        for _ in range(0, numTrials):
-            testMHBegin_Result = runMetropolisHasting_Test(
-                'MetroHast_BeginOrder0.95',
-                BN, 
-                param.query, 
-                param.evidenceBegin, 
-                0.95,
-                numSamples, 
-                numTrials
-            )
-            testResults.append(testMHBegin_Result)
+        
+        testMHBegin_Result = runParallelMetropolisHasting_Tests(
+            'MetroHast_BeginOrder0.95',
+            BN, 
+            param.query, 
+            param.evidenceBegin, 
+            0.95,
+            numSamples, 
+            numTrials
+        )
+        testResults.extend(testMHBegin_Result)
+
         print('Finished metropolis begin 0.95')
-        for _ in range(0, numTrials):
-            testMHEnd_Result = runMetropolisHasting_Test(
-                'MetroHast_EndOrder0.95',
-                BN, 
-                param.query, 
-                param.evidenceEnd, 
-                0.95,
-                numSamples, 
-                numTrials
-            )
-            testResults.append(testMHEnd_Result)
+
+        testMHEnd_Result = runParallelMetropolisHasting_Tests(
+            'MetroHast_EndOrder0.95',
+            BN, 
+            param.query, 
+            param.evidenceEnd, 
+            0.95,
+            numSamples, 
+            numTrials
+        )
+        testResults.extend(testMHEnd_Result)
 
         print('Finished metropolis 0.95 suite')
         # Create a new Excel workbook
@@ -202,8 +248,8 @@ def main():
     uniformParams = getUniformParams()
     numSamples = 1000
     numTrials = 10
-    excelName = './results/test.xlsx'
+    excelName = './results/testparallel.xlsx'
     runTestingSuite(uniformParams, excelName, numSamples, numTrials)
-    
+
 if __name__ == "__main__":
     main()
