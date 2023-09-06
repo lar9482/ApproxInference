@@ -1,6 +1,6 @@
 from BayesNet.loadBayesNet import loadInBayesNet
-from dataset.datasetParams import getUniformParams
-from results.result import testResult
+from utils.datasetParams import getUniformParams, getNearZeroParams, getNearOneParams
+from utils.result import testResult
 
 from openpyxl import Workbook
 from multiprocessing import Manager, Lock, Process
@@ -45,7 +45,7 @@ def runMetropolisHasting_Test(
         numTrials,
         sharedTestResults,
         lock
-):
+    ):
     startTime = time.process_time()
     MH = BN.metropolisHasting_Query(query, evidence, numSamples, P)
     endTime = time.process_time()
@@ -121,7 +121,9 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
             testResults.append(testLWEnd_Result)
 
         print('Finished likelihood weighting suite')
+
         ######################################################################################
+
         for _ in range(0, numTrials):
             testGABegin_Result = runGibbsAsk_Test(
                 'Gibbs_BeginOrder',
@@ -145,6 +147,7 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
             testResults.append(testGAEnd_Result)
 
         print('Finished gibbs ask suite')
+
         ######################################################################################
         
         testMHBegin_Result = runParallelMetropolisHasting_Tests(
@@ -158,7 +161,7 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
         )
         testResults.extend(testMHBegin_Result)
 
-        print('Finished metropolis 0.75 begin suite')
+        print('Finished beginning portion of Metropolis Hasting for 0.75')
         
         testMHEnd_Result = runParallelMetropolisHasting_Tests(
             'MetroHast_EndOrder0.75',
@@ -170,8 +173,10 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
             numTrials
         )
         testResults.extend(testMHEnd_Result)
-        print('Finished metropolis 0.75 end suite')
+
+        print('Finished final portion of Metropolis Hasting for 0.75')
         print('Finished metropolis 0.75 suite')
+
         ######################################################################################
         
         testMHBegin_Result = runParallelMetropolisHasting_Tests(
@@ -184,7 +189,8 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
             numTrials
         )
         testResults.extend(testMHBegin_Result)
-        print('Finished metropolis begin 0.85')
+
+        print('Finished beginning portion of Metropolis Hasting for 0.85')
         
         testMHEnd_Result = runParallelMetropolisHasting_Tests(
             'MetroHast_EndOrder0.85',
@@ -197,7 +203,9 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
         )
         testResults.extend(testMHEnd_Result)
 
+        print('Finished final portion of Metropolis Hasting for 0.85')
         print('Finished metropolis 0.85 suite')
+
         ######################################################################################
         
         testMHBegin_Result = runParallelMetropolisHasting_Tests(
@@ -211,7 +219,7 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
         )
         testResults.extend(testMHBegin_Result)
 
-        print('Finished metropolis begin 0.95')
+        print('Finished beginning portion of Metropolis Hasting for 0.95')
 
         testMHEnd_Result = runParallelMetropolisHasting_Tests(
             'MetroHast_EndOrder0.95',
@@ -224,7 +232,9 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
         )
         testResults.extend(testMHEnd_Result)
 
+        print('Finished final portion of Metropolis Hasting for 0.95')
         print('Finished metropolis 0.95 suite')
+
         # Create a new Excel workbook
         workbook = Workbook()
         sheet = workbook.active
@@ -242,14 +252,15 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
                 testResult.runTime
             ])
         
-        workbook.save(excelName)
+        workbook.save(excelName + param.testName)
             
 def main():
-    uniformParams = getUniformParams()
     numSamples = 1000
-    numTrials = 10
-    excelName = './results/testparallel.xlsx'
-    runTestingSuite(uniformParams, excelName, numSamples, numTrials)
+    numTrials = 25
+    excelBasePath = './results/'
+    runTestingSuite(getUniformParams(), excelBasePath, numSamples, numTrials)
+    runTestingSuite(getNearZeroParams, excelBasePath, numSamples, numTrials)
+    runTestingSuite(getNearOneParams, excelBasePath, numSamples, numTrials)
 
 if __name__ == "__main__":
     main()
