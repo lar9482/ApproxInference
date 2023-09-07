@@ -256,11 +256,14 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
             
 def main():
     numSamples = 1000
-    numTrials = 25
+    numTrials = 20
     excelBasePath = './results/'
-    runTestingSuite(getUniformParams(), excelBasePath, numSamples, numTrials)
-    runTestingSuite(getNearZeroParams, excelBasePath, numSamples, numTrials)
-    runTestingSuite(getNearOneParams, excelBasePath, numSamples, numTrials)
+    # runTestingSuite(getUniformParams(), excelBasePath, numSamples, numTrials)
+    # runTestingSuite(getNearZeroParams(), excelBasePath, numSamples, numTrials)
+    # runTestingSuite(getNearOneParams(), excelBasePath, numSamples, numTrials)
+
+    BN = loadInBayesNet('./dataset/datasetNearOne/polytree35.json')
+    BN.likelihoodWeighting_Query(5, {0: 0}, 1)
 
 if __name__ == "__main__":
     main()
