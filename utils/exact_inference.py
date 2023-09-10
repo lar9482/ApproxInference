@@ -13,17 +13,17 @@ import time
 import ujson
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-f', '--file', nargs=1, required = True, help='The name of the json file from gen-bn')
-parser.add_argument('-q', '--query', nargs=1, default='0', help='The query variable name')
-parser.add_argument('-m', '--multiprocessing', action='store_true', help='Enables multiprocessing over the query variable values, probably don\'t use this if your other methods don\'t use multiprocessing, as this will run twice as fast.')
-args = parser.parse_args()
+# parser = argparse.ArgumentParser()
+# parser.add_argument('-f', '--file', nargs=1, required = True, help='The name of the json file from gen-bn')
+# parser.add_argument('-q', '--query', nargs=1, default='0', help='The query variable name')
+# parser.add_argument('-m', '--multiprocessing', action='store_true', help='Enables multiprocessing over the query variable values, probably don\'t use this if your other methods don\'t use multiprocessing, as this will run twice as fast.')
+# args = parser.parse_args()
 
 
     
-jsonfileloc=str(args.file[0])
+# jsonfileloc=str(args.file[0])
 
-multi = args.multiprocessing
+multi = False
 
 class Bayes_Net():
     def __init__(self):
@@ -149,26 +149,27 @@ class Bayes_Node():
         self.parents = parents
         self.cpt = cpt
 
-def runner():
-    bn = Bayes_Net()
-    bn.create_from_json(jsonfileloc)
-    # bn.draw()
-    evidence = { 2: 0, 4: 0 }
-    print(evidence)
-    starttime = time.time()
-    if multi:
-        print("Running multiprocessed exact inference on query variable", args.query[0])
-    else:
-        print("Running exact inference on query variable", args.query[0])
-    exact_enum = bn.enumeration_ask(args.query[0], evidence)
-    # print(exact_enum)
-    endtime = time.time()
-    exact_time = (endtime-starttime)
+# def runner():
+#     bn = Bayes_Net()
+#     bn.create_from_json(jsonfileloc)
+#     # bn.draw()
+#     evidence = { 2: 0, 4: 0 }
+#     print(evidence)
+#     starttime = time.time()
+#     if multi:
+#         print("Running multiprocessed exact inference on query variable", args.query[0])
+#     else:
+#         print("Running exact inference on query variable", args.query[0])
+#     exact_enum = bn.enumeration_ask(args.query[0], evidence)
 
-    print("-----Finished!-----")
-    print("Time\t:", exact_time,
-            "secs\nP_False\t:", exact_enum[0],
-            "\nP_True\t:",exact_enum[1])
+#     # print(exact_enum)
+#     endtime = time.time()
+#     exact_time = (endtime-starttime)
+
+#     print("-----Finished!-----")
+#     print("Time\t:", exact_time,
+#             "secs\nP_False\t:", exact_enum[0],
+#             "\nP_True\t:",exact_enum[1])
     
-if __name__ == "__main__":
-    runner()
+# if __name__ == "__main__":
+#     runner()

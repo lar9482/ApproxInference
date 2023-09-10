@@ -13,3 +13,14 @@ class testResult:
         self.PFalse = PFalse
         self.PTrue = PTrue
         self.runTime = runTime
+
+class exactResult:
+    def __init__(self,
+                 testName, 
+                 PFalse, 
+                 PTrue, 
+                 runTime):
+        self.testName = testName
+        self.PFalse = PFalse
+        self.PTrue = PTrue
+        self.runTime = runTime
