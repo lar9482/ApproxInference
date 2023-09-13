@@ -11,22 +11,43 @@ class testParam:
     query the middle variable, and set the evidence to the beginning and ending variables
     according to the topological order of the networks
 """
+
+def getDAGParams():
+    dagParams = [
+        testParam(
+            'datasetUniform_dag10.xlsx',
+            './dataset/datasetUniform/dag10.json',
+            7,
+            {6: 0, 8: 0, 9: 0},
+            {3: 0, 0: 0, 2: 0}
+        ),
+        testParam(
+            'datasetUniform_dag20.xlsx',
+            './dataset/datasetUniform/dag20.json',
+            10,
+            {18: 0, 19: 0, 17: 0, 14: 0, 16: 0},
+            {7: 0, 1: 0, 3: 0, 5: 0, 2: 0}
+        )
+    ]
+
+    return dagParams
+
 def getUniformParams():
     uniformParams = [
-    testParam(
-        'datasetUniform_polytree5.xlsx',
-        './dataset/datasetUniform/polytree5.json',
-        3,
-        { 0: 0, 1: 0 },
-        { 2: 0, 4: 0 }
-    ),
-    testParam(
-        'datasetUniform_polytree15.xlsx',
-        './dataset/datasetUniform/polytree15.json',
-        7,
-        {0: 0, 1: 0, 2: 0, 4: 0},
-        {10: 0, 14: 0, 13: 0, 12: 0},
-    ),
+    # testParam(
+    #     'datasetUniform_polytree5.xlsx',
+    #     './dataset/datasetUniform/polytree5.json',
+    #     3,
+    #     { 0: 0, 1: 0 },
+    #     { 2: 0, 4: 0 }
+    # ),
+    # testParam(
+    #     'datasetUniform_polytree15.xlsx',
+    #     './dataset/datasetUniform/polytree15.json',
+    #     7,
+    #     {0: 0, 1: 0, 2: 0, 4: 0},
+    #     {10: 0, 14: 0, 13: 0, 12: 0},
+    # ),
     testParam(
         'datasetUniform_polytree25.xlsx',
         './dataset/datasetUniform/polytree25.json',

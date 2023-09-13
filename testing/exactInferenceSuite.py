@@ -47,6 +47,7 @@ def runExactSuite(datasetParams):
     workbook.close()
 
 def main():
-    runExactSuite(getUniformParams())
-    runExactSuite(getNearZeroParams())
-    runExactSuite(getNearOneParams())
+    # runExactSuite(getUniformParams())
+    # runExactSuite(getNearZeroParams())
+    # runExactSuite(getNearOneParams())
+    pass

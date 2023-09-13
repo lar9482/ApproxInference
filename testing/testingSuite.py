@@ -257,9 +257,10 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
         workbook.save(excelName + param.testName)
 
 def main():
-    numSamples = 1000
-    numTrials = 25
-    excelBasePath = './results/'
-    runTestingSuite(getUniformParams(), excelBasePath, numSamples, numTrials)
-    runTestingSuite(getNearZeroParams(), excelBasePath, numSamples, numTrials)
-    runTestingSuite(getNearOneParams(), excelBasePath, numSamples, numTrials)
+    # numSamples = 1000
+    # numTrials = 25
+    # excelBasePath = './results/'
+    # runTestingSuite(getUniformParams(), excelBasePath, numSamples, numTrials)
+    # runTestingSuite(getNearZeroParams(), excelBasePath, numSamples, numTrials)
+    # runTestingSuite(getNearOneParams(), excelBasePath, numSamples, numTrials)
+    pass
