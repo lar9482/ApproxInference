@@ -1,17 +1,8 @@
-from testing.testingSuite import runTestingSuite
 from utils.datasetParams import getUniformParams, getNearZeroParams, getNearOneParams, getDAGParams
-from utils.exact_inference import Bayes_Net
-from BayesNet.bayesNet import BayesNet
-from utils.result import exactResult
-from BayesNet.loadBayesNet import loadInBayesNet
+from testing.testingSuite import runTestingSuite
 from testing.exactInferenceSuite import runExactSuite
-import time
-import openpyxl
 
 import pandas as pd
-import numpy as np
-
-import matplotlib.pyplot as plt
 
 def printFileContent(filename, allTestNames):
     fileDF = pd.read_excel('./results/' + filename, engine='openpyxl')
@@ -38,10 +29,14 @@ def printFileContent(filename, allTestNames):
         print('#####################################################################')
 
 def main():
+    runExactSuite(getUniformParams())
+    runExactSuite(getNearZeroParams())
+    runExactSuite(getNearOneParams())
+    runExactSuite(getDAGParams())
+
     numSamples = 5000
     numTrials = 25
     excelBasePath = './results/'
-    runExactSuite(getDAGParams())
     runTestingSuite(getUniformParams(), excelBasePath, numSamples, numTrials)
     runTestingSuite(getNearZeroParams(), excelBasePath, numSamples, numTrials)
     runTestingSuite(getNearOneParams(), excelBasePath, numSamples, numTrials)

@@ -16,10 +16,11 @@ class testResult:
 
 class exactResult:
     def __init__(self,
-                 testName, 
-                 PFalse, 
-                 PTrue, 
-                 runTime):
+            testName, 
+            PFalse, 
+            PTrue, 
+            runTime
+    ):
         self.testName = testName
         self.PFalse = PFalse
         self.PTrue = PTrue

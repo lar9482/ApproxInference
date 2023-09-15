@@ -170,6 +170,8 @@ class BayesNet:
 
         @param N: Integer
             The number of samples to calculate
+
+        @Returns: A distribution for the query variable.
     """
     def likelihoodWeighting_Query(self, query, evidence, N):
         W = {0: 0, 1: 0}
@@ -190,6 +192,8 @@ class BayesNet:
 
         @param N: Integer
             The number of samples to calculate
+
+        @Returns: A distribution for the query variable.
     """
     def gibbsAsk_Query(self, query, evidence, N):
 
@@ -209,6 +213,18 @@ class BayesNet:
         
         return (self.__normalizeVector(C), currNetworkState)
     
+    """
+        @param query: Integer
+            The node id to be queried from the network
+
+        @param evidence: {Integer: Integer} (NodeID: NodeValue)
+            This dictionary will map the evidence node is to its given node value
+
+        @param N: Integer
+            The number of samples to calculate
+
+        @Returns: A distribution for the query variable.
+    """
     def metropolisHasting_Query(self, query, evidence, N, P):
         distribution = {0: 0, 1: 0}
         sample = self.__getInitialSample_FixedByEvidence(evidence)
@@ -217,7 +233,7 @@ class BayesNet:
             chance = random.uniform(0, 1)
 
             if (chance < P):
-                (gibbsProbDis, gibbsSample) = self.gibbsAsk_Query(query, evidence, 20)
+                (gibbsProbDis, gibbsSample) = self.gibbsAsk_Query(query, evidence, 100)
                 sample = gibbsSample
             else:
                 (newSample, newWeight) = self.__getWeightedSample(evidence)
