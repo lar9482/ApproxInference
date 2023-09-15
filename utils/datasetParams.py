@@ -7,7 +7,7 @@ class testParam:
         self.evidenceEnd = evidenceEnd
 
 """
-    For each of these graphs.
+    For each of these graphs test cases.
     query the middle variable, and set the evidence to the beginning and ending variables
     according to the topological order of the networks
 """
@@ -34,20 +34,20 @@ def getDAGParams():
 
 def getUniformParams():
     uniformParams = [
-    # testParam(
-    #     'datasetUniform_polytree5.xlsx',
-    #     './dataset/datasetUniform/polytree5.json',
-    #     3,
-    #     { 0: 0, 1: 0 },
-    #     { 2: 0, 4: 0 }
-    # ),
-    # testParam(
-    #     'datasetUniform_polytree15.xlsx',
-    #     './dataset/datasetUniform/polytree15.json',
-    #     7,
-    #     {0: 0, 1: 0, 2: 0, 4: 0},
-    #     {10: 0, 14: 0, 13: 0, 12: 0},
-    # ),
+    testParam(
+        'datasetUniform_polytree5.xlsx',
+        './dataset/datasetUniform/polytree5.json',
+        3,
+        { 0: 0, 1: 0 },
+        { 2: 0, 4: 0 }
+    ),
+    testParam(
+        'datasetUniform_polytree15.xlsx',
+        './dataset/datasetUniform/polytree15.json',
+        7,
+        {0: 0, 1: 0, 2: 0, 4: 0},
+        {10: 0, 14: 0, 13: 0, 12: 0},
+    ),
     testParam(
         'datasetUniform_polytree25.xlsx',
         './dataset/datasetUniform/polytree25.json',
@@ -55,14 +55,6 @@ def getUniformParams():
         {0: 0, 1: 0, 2: 0, 3: 0, 6: 0, 7: 0},
         {13: 0, 17: 0, 18: 0, 22: 0, 24: 0, 19: 0}
     )]
-    # ),
-    # testParam(
-    #     'datasetUniform_polytree35.xlsx',
-    #     './dataset/datasetUniform/polytree35.json',
-    #     14,
-    #     {0: 0, 1: 0, 5: 0, 6: 0, 2: 0, 3: 0, 10: 0, 27: 0},
-    #     {13: 0, 17: 0, 25: 0, 31: 0, 28: 0, 30: 0, 29: 0, 15: 0}
-    # )]
 
     return uniformParams
 
@@ -89,13 +81,6 @@ def getNearZeroParams():
         {0: 0, 1: 0, 6: 0, 8: 0, 14: 0, 2: 0},
         {21: 0, 5: 0, 20: 0, 22: 0, 23: 0, 7: 0}
     )]
-    # testParam(
-    #     'datasetNearZero_polytree35.xlsx',
-    #     './dataset/datasetNearZero/polytree35.json',
-    #     10,
-    #     {0: 0, 1: 0, 2: 0, 14: 0, 12: 0, 33: 0, 3: 0, 20: 0},
-    #     {17: 0, 31: 0, 22: 0, 26: 0, 18: 0, 29: 0, 34: 0, 28: 0}
-    # )]
 
     return nearZeroParams
 
@@ -122,12 +107,5 @@ def getNearOneParams():
         {0: 0, 1: 0, 4: 0, 12: 0, 2: 0, 3: 0},
         {16: 0, 18: 0, 20: 0, 13: 0, 21: 0, 24: 0}
     )]
-    # testParam(
-    #     'datasetNearOne_polytree35.xlsx',
-    #     './dataset/datasetNearOne/polytree35.json',
-    #     20,
-    #     {0: 0, 1: 0, 2: 0, 3: 0, 5: 0, 7: 0, 12: 0, 16: 0},
-    #     {30: 0, 8: 0, 15: 0, 31: 0, 11: 0, 21: 0, 29: 0, 32: 0}
-    # )]
 
     return nearOneParams

@@ -28,6 +28,9 @@ class BayesNode:
         @param parentValues: List(Integer)/Tuple(Integer)
             The actual valules that the parent RVs are assigned. These are necessary to actually
             query the CPT for the probability itself
+        
+        @Returns Float:
+            The probability queried from the CPT table.
     """
     def lookUpProb_givenNodeAndParentValues(self, nodeValue, parentValues):
         if isinstance(parentValues, list):

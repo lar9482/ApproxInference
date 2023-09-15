@@ -1,7 +1,6 @@
-from testing.testingSuite import runTestingSuite
-from utils.datasetParams import getUniformParams, getNearZeroParams, getNearOneParams
 from utils.exact_inference import Bayes_Net
 from utils.result import exactResult
+
 import time
 import openpyxl
 
@@ -45,9 +44,3 @@ def runExactSuite(datasetParams):
 
     workbook.save('./results/exactResults.xlsx')
     workbook.close()
-
-def main():
-    # runExactSuite(getUniformParams())
-    # runExactSuite(getNearZeroParams())
-    # runExactSuite(getNearOneParams())
-    pass

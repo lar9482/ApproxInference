@@ -1,13 +1,9 @@
-
-from utils.datasetParams import getUniformParams, getNearZeroParams, getNearOneParams
 from BayesNet.loadBayesNet import loadInBayesNet
 from utils.result import testResult
-
 from openpyxl import Workbook
 from multiprocessing import Manager, Lock, Process
 
 import time
-
 
 def runLikelihoodWeighting_Test(name, BN, query, evidence, numSamples, numTrials):
     startTime = time.time()
@@ -94,7 +90,7 @@ def runParallelMetropolisHasting_Tests(name, BN, query, evidence, P, numSamples,
     
     return mhResults
 
-def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10):
+def runTestingSuite(datasetParams, excelBasePath, numSamples = 1000, numTrials = 10):
     for param in datasetParams:
 
         BN = loadInBayesNet(param.filePath)
@@ -254,13 +250,4 @@ def runTestingSuite(datasetParams, excelName, numSamples = 1000, numTrials = 10)
                 testResult.runTime
             ])
         
-        workbook.save(excelName + param.testName)
-
-def main():
-    # numSamples = 1000
-    # numTrials = 25
-    # excelBasePath = './results/'
-    # runTestingSuite(getUniformParams(), excelBasePath, numSamples, numTrials)
-    # runTestingSuite(getNearZeroParams(), excelBasePath, numSamples, numTrials)
-    # runTestingSuite(getNearOneParams(), excelBasePath, numSamples, numTrials)
-    pass
+        workbook.save(excelBasePath + param.testName)

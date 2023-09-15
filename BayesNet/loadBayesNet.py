@@ -5,6 +5,9 @@ import json
 """
     @param filename: string
         The file name of the json file to load in the bayes net.
+    
+    @Returns BayesNet:
+        The actual bayes net representation of the inputted file.
 """
 def loadInBayesNet(filename):
     rawBayesNetData = json.load(open(filename))
