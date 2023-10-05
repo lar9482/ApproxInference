@@ -19,7 +19,7 @@ The performance of these algorithms was using the following parameters:
 Performance Results(TL;DR):
  - Likelihood weighting converged to the truth probabilities very well.
  - Gibbs Sampling itself wasn't able to converged to the truth probabilities. It basically wandered around the state space too much.
- - Metropolis Hasting had slightly stronger convergence than Likelihood weightin g(Lower standard deviation), but it didn't always converge to the truth probabilities.
-
+ - Metropolis Hasting had lower standard deviations than Likelihood weighting, but it didn't always converge to the truth probabilities.
+  
 For more information, please see **info**
 
